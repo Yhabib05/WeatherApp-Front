@@ -4,14 +4,23 @@
   <input [(ngModel)]="username" placeholder="enter your name"/>
   <button (click)="saveUser()">Save</button>
 
-  <hr>
+  <hr/>
   <div class="city-box">
-    <p>{{city}}</p>
+    <p>{{ city1 | json }}</p>
     <span
       class="heart"
-      (click)="toggleFavorite()"
+      (click)="toggleFavorite(city1)"
     >
-      {{ isFavorite() ? '❤️' : '🤍' }}
+      {{ isFavorite(city1) ? '❤️' : '🤍' }}
+    </span>
+  </div>
+  <div class="city-box">
+    <p>{{city2 | json}}</p>
+    <span
+      class="heart"
+      (click)="toggleFavorite(city2)"
+    >
+      {{ isFavorite(city2) ? '❤️' : '🤍' }}
     </span>
   </div>
 </div>

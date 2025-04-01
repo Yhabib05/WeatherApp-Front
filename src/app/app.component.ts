@@ -1,35 +1,85 @@
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import {JsonPipe} from '@angular/common';
+
+interface Coord {
+  lat: number; lon: number;
+}
+interface User {
+  id: string;
+  username: string;
+  favoriteCoord: Coord | null;
+}
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,FormsModule],
+  standalone:true,
+  imports: [RouterOutlet, FormsModule, HttpClientModule, JsonPipe],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   username:string = '';
-  city:string = 'Paris';
-  favoriteCity: string | null = null;
+  city1:Coord = {
+    lat: 48.7189,
+    lon: 2.2335,
+  };
+  city2:Coord = {
+    lat: 0.0250,
+    lon: 0.1515,
+  };
+  favoriteCity: Coord | null = null;
+  userId: string = '';
 
-  saveUser(){
-    alert(`Hello ${this.username}`);
+
+constructor(private http: HttpClient) {}
+
+  saveUser() {
+    //alert(`Hello ${this.username}`);
+    const payload = {username: this.username};
+    this.http.post<User>('http://localhost:8080/user', payload).subscribe({
+      next: (res) => {
+        this.userId = res.id;
+        alert(`User ${this.username} created!`);
+      },
+      error: () => alert('Error creating user'),
+    });
   }
 
-  toggleFavorite(){
-    console.log("toggleFavorite has been called");
-    if(this.favoriteCity===this.city){
-      this.favoriteCity = null;
-    } else{
-      this.favoriteCity = this.city;
+  toggleFavorite(city: Coord ) {
+    if (!this.username || !this.userId) {
+      alert('Save user first');
+      return;
+    }
+    const isSame = JSON.stringify(this.favoriteCity) === JSON.stringify(city);
+
+    if (isSame) {
+      // Remove from favorite
+      this.http
+        .delete('http://localhost:8080/user/favorite', {
+          body: city,
+          params: {userId: this.userId}
+        })
+        .subscribe(() => {
+          this.favoriteCity = null;
+        });
+    } else {
+      // Add to favorite
+      this.http
+        .post(`http://localhost:8080/user/favorite`,{
+            body: city,
+            params:{userId: this.userId}
+        })
+        .subscribe(() => {
+          this.favoriteCity = city;
+        });
     }
   }
 
-  isFavorite():boolean{
-    console.log("isFavorite called", this.favoriteCity === this.city);
-    return this.favoriteCity === this.city;
+  isFavorite(city: Coord): boolean {
+    return JSON.stringify(this.favoriteCity) === JSON.stringify(city);
   }
-
 }
 
