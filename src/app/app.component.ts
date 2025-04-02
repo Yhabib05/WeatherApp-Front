@@ -53,14 +53,16 @@ constructor(private http: HttpClient) {}
       alert('Save user first');
       return;
     }
-    const isSame = JSON.stringify(this.favoriteCity) === JSON.stringify(city);
+    const isSame = this.favoriteCity?.lon ===city.lon && this.favoriteCity?.lat ===city.lat ;
+    console.log(isSame);
 
     if (isSame) {
       // Remove from favorite
       this.http
         .delete('http://localhost:8080/user/favorite', {
           body: city,
-          params: {userId: this.userId}
+          params: {userId: this.userId},
+          responseType: "text" as const //bcs the backend returns a text: city removed from  favorite
         })
         .subscribe(() => {
           this.favoriteCity = null;
@@ -68,9 +70,9 @@ constructor(private http: HttpClient) {}
     } else {
       // Add to favorite
       this.http
-        .post(`http://localhost:8080/user/favorite`,{
-            body: city,
-            params:{userId: this.userId}
+        .post(`http://localhost:8080/user/favorite`,city,{
+            params:{userId: this.userId},
+          responseType: "text" as const //bcs the backend returns a text: city added to favorite
         })
         .subscribe(() => {
           this.favoriteCity = city;
@@ -79,7 +81,7 @@ constructor(private http: HttpClient) {}
   }
 
   isFavorite(city: Coord): boolean {
-    return JSON.stringify(this.favoriteCity) === JSON.stringify(city);
+    return  this.favoriteCity?.lon ===city.lon && this.favoriteCity?.lat ===city.lat ;
   }
 }
 
