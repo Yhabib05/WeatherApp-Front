@@ -1,12 +1,36 @@
 <div class="container">
   <h2>Welcome!!</h2>
 
-  <input [(ngModel)]="username" placeholder="enter your name"/>
-  <button (click)="saveUser()">Save</button>
+  <div style="position: absolute; top: 10px; right: 20px;" *ngIf="userId">
+     <span *ngIf="!isEditingUser">
+      👤 {{ username }}
+       <button (click)="setEditUser()">Edit User</button>
+    </span>
+
+    <span *ngIf="isEditingUser">
+      👤
+      <input [(ngModel)]="username" placeholder="Change name" />
+      <button (click)="changeName(username)">Change User Name</button>
+    </span>
+  </div>
+
+  <!-- Only show this if user is NOT saved yet -->
+  <div *ngIf="!userId">
+    <input [(ngModel)]="username" placeholder="Enter your name" />
+    <button (click)="saveUser()">Save</button>
+  </div>
 
   <hr/>
+
+  <!-- Create new city -->
+  <div>
+    <input [(ngModel)]="newCityName" placeholder="Add a new city" />
+    <button (click)="addCity()">Add City</button>
+  </div>
+
   <div class="city-box">
-    <p>{{ city1 | json }}</p>
+    <p>{{ city1 }}</p>
+    <button (click)="getWeatherByCity(city1)">Get Weather</button>
     <span
       class="heart"
       (click)="toggleFavorite(city1)"
@@ -15,7 +39,8 @@
     </span>
   </div>
   <div class="city-box">
-    <p>{{city2 | json}}</p>
+    <p>{{city2 }}</p>
+    <button (click)="getWeatherByCity(city2)">Get Weather</button>
     <span
       class="heart"
       (click)="toggleFavorite(city2)"
@@ -23,4 +48,13 @@
       {{ isFavorite(city2) ? '❤️' : '🤍' }}
     </span>
   </div>
+
+  <div *ngFor="let city of createdCities" class="city-box">
+    <p>{{ city }}</p>
+    <button (click)="getWeatherByCity(city)">Get Weather</button>
+    <span class="heart" (click)="toggleFavorite(city)">
+    {{ isFavorite(city) ? '❤️' : '🤍' }}
+  </span>
+  </div>
+
 </div>
