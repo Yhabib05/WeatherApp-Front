@@ -1,60 +1,50 @@
 <div class="container">
   <h2>Welcome!!</h2>
 
-  <div style="position: absolute; top: 10px; right: 20px;" *ngIf="userId">
-     <span *ngIf="!isEditingUser">
-      👤 {{ username }}
-       <button (click)="setEditUser()">Edit User</button>
+  <div style="position: absolute; top: 10px; right: 20px;" *ngIf="user?.id">
+    <span *ngIf="!isEditingUser">
+      👤 {{ user?.username }}
+      <button (click)="setEditUser()">Edit User</button>
     </span>
 
     <span *ngIf="isEditingUser">
       👤
       <input [(ngModel)]="username" placeholder="Change name" />
-      <button (click)="changeName(username)">Change User Name</button>
+      <button (click)="changeName(username)">Change</button>
     </span>
   </div>
 
-  <!-- Only show this if user is NOT saved yet -->
-  <div *ngIf="!userId">
+  <div *ngIf="!user?.id">
     <input [(ngModel)]="username" placeholder="Enter your name" />
     <button (click)="saveUser()">Save</button>
   </div>
 
-  <hr/>
+  <hr />
 
-  <!-- Create new city -->
   <div>
     <input [(ngModel)]="newCityName" placeholder="Add a new city" />
     <button (click)="addCity()">Add City</button>
   </div>
 
-  <div class="city-box">
-    <p>{{ city1 }}</p>
-    <button (click)="getWeatherByCity(city1)">Get Weather</button>
-    <span
-      class="heart"
-      (click)="toggleFavorite(city1)"
-    >
-      {{ isFavorite(city1) ? '❤️' : '🤍' }}
-    </span>
-  </div>
-  <div class="city-box">
-    <p>{{city2 }}</p>
-    <button (click)="getWeatherByCity(city2)">Get Weather</button>
-    <span
-      class="heart"
-      (click)="toggleFavorite(city2)"
-    >
-      {{ isFavorite(city2) ? '❤️' : '🤍' }}
-    </span>
-  </div>
-
   <div *ngFor="let city of createdCities" class="city-box">
-    <p>{{ city }}</p>
-    <button (click)="getWeatherByCity(city)">Get Weather</button>
-    <span class="heart" (click)="toggleFavorite(city)">
-    {{ isFavorite(city) ? '❤️' : '🤍' }}
-  </span>
-  </div>
+    <p>
+      {{ city.name }}
+      <span *ngIf="city.temperature !== undefined">
+        {{ city.temperature }}°C
+      </span>
+    </p>
+    <button (click)="getWeatherByCoord(city)">Refresh Weather Infos</button>
+    <div *ngIf="city.weatherInfos">
+      <h4>Weather Info:</h4>
+      <ul>
+        <li><strong>Temperature:</strong> {{ city.weatherInfos.main?.temp | number: '1.0-0' }}°C</li>
+        <li><strong>Humidity:</strong> {{ city.weatherInfos.main?.humidity }}%</li>
+        <li><strong>Pressure:</strong> {{ city.weatherInfos.main?.pressure }} Pa</li>
+      </ul>
+    </div>
 
+    <span class="heart" (click)="toggleFavorite(city.name)">
+      {{ isFavorite(city.name) ? '❤️' : '🤍' }}
+    </span>
+  </div>
 </div>
